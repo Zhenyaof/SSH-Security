@@ -11,69 +11,26 @@ This project demonstrates how to configure SSH connections for secure remote acc
 
 ## Configuration Details
 
-### Passwords:
-- **Privilege Password:** `class`
-- **VTY Line Password:** `cisco`
-- **Console Line Password:** `cisco`
+## Part 1: Configure SSH on the Router and Switch
+1. **Set Hostname & Domain**  
+   ```bash
+   R1(config)# hostname R1  
+   R1(config)# ip domain-name amir.com
 
-### Domain Name:
-- **Domain:** `amir.net`
+R1(config)# crypto key generate rsa modulus 1024
 
-## Steps to Set Up SSH Connection
+R1(config)# username admin privilege 15 secret adminpass
 
-### 1. **Enable SSH on the Router**
-   - Set the domain name:
-     ```bash
-     Router(config)# ip domain-name amir.net
-     ```
-   - Generate RSA keys:
-     ```bash
-     Router(config)# crypto key generate rsa
-     ```
-   - Set the SSH version:
-     ```bash
-     Router(config)# ip ssh version 2
-     ```
-   - Create a local user for SSH login:
-     ```bash
-     Router(config)# username admin privilege 15 secret <your_password>
-     ```
+R1(config)# line vty 0 4  
+R1(config-line)# transport input ssh  
+R1(config-line)# login local
 
-### 2. **Configure Line VTY Access**
-   - Configure VTY line access to accept SSH connections:
-     ```bash
-     Router(config)# line vty 0 4
-     Router(config-line)# transport input ssh
-     Router(config-line)# login local
-     Router(config-line)# password cisco
-     ```
+R1(config)# ip ssh time-out 75  
+R1(config)# ip ssh authentication-retries 2
 
-### 3. **Configure Console Access**
-   - Set the console line password:
-     ```bash
-     Router(config)# line con 0
-     Router(config-line)# password cisco
-     Router(config-line)# login
-     ```
+The same applied to the Switch
 
-### 4. **Configure Privilege Mode Password**
-   - Set the privilege password:
-     ```bash
-     Router(config)# enable secret class
-     ```
+## Part 2: Configure Basic Security on the Router
+R1(config)# service password-encryption
 
-### 5. **Save Configuration**
-   - Save the configuration to ensure settings persist:
-     ```bash
-     Router# write memory
-     ```
 
-### 6. **Verify the SSH Configuration**
-   - To test the SSH connection, use the following command from a remote machine:
-     ```bash
-     ssh admin@<router_ip_address>
-     ```
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
